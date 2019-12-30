@@ -2,13 +2,39 @@
 
 _Dockerfile_ and _Makefile_ for running _JOS_ and its dependencies in a [_Docker_](https://docs.docker.com/install/linux/docker-ce/ubuntu/) container.
 
-- Grade
+## Initialize
+
+You will have to change a little bit the _Makefile_ that comes with _JOS_ in the target `gdb`, like this:
+
+- Original
+
+```make
+gdb:
+```
+
+- Changed
+
+```make
+gdb: $(IMAGES)
+```
+
+In this way, the container running the _GDB_ session, compiles the files and produces the necessary binaries for _GDB_ to read the symbols from.
+
+Finally you will need to create a _docker network_ for the containers to communicate among them, like this:
+
+```bash
+$ make net
+```
+
+## Running
+
+- ***Grade***
 
 ```bash
 $ make grade
 ```
 
-- Run a program
+- ***Run a program***
 
 	- Graphical
 
@@ -22,7 +48,7 @@ $ make grade
     $ make run-%-nox
     ```
 
-- QEMU
+- ***QEMU***
 
 	- Graphical
 
@@ -35,4 +61,8 @@ $ make grade
     ```bash
     $ make qemu-nox
     ```
+
+- ***GDB***
+
+If you want to run a _GDB_ session you will need two terminals as in the normal way, an run the commands you will run with the non containerazed version.
 
