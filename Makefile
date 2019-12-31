@@ -1,40 +1,48 @@
 GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
-GDBSERV := jos:$(GDBPORT)
+
+DOCKER := docker
+DOCKRUN := container run
+DOCKBUILD := build
+DOCKNETWORK := network create
+DOCKOPTS := -it --rm
+DOCKOPTSGDB := --net=jos-net
+DOCKIMG := jos-env
+DOCKNET := jos-net
 
 net:
-	docker network create --driver=bridge jos-net
+	$(DOCKER) $(DOCKNETWORK) --driver=bridge $(DOCKNET)
 
 build:
-	docker build -t jos-env .
+	$(DOCKER) $(DOCKBUILD) -t $(DOCKIMG) .
 
 gdb: build
-	docker container run -it --rm --net=jos-net --name=gdb jos-env $(MAKE) gdb GDBSERV=$(GDBSERV)
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=gdb $(DOCKIMG) $(MAKE) gdb GDBSERV=jos:$(GDBPORT)
 
 grade: build
-	docker container run -it --rm jos-env $(MAKE) grade
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKIMG) $(MAKE) grade
 
 qemu: build
-	docker container run -it --rm jos-env $(MAKE) qemu
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKIMG) $(MAKE) qemu
 
 qemu-nox: build
-	docker container run -it --rm jos-env $(MAKE) qemu-nox
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKIMG) $(MAKE) qemu-nox
 
 qemu-gdb: build
-	docker container run -it --rm --net=jos-net --name=jos jos-env $(MAKE) qemu-gdb GDBSERV=0.0.0.0:$(GDBPORT)
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=jos $(DOCKIMG) $(MAKE) qemu-gdb GDBSERV=0.0.0.0:$(GDBPORT)
 
 qemu-nox-gdb: build
-	docker container run -it --rm --net=jos-net --name=jos jos-env $(MAKE) qemu-nox-gdb GDBSERV=0.0.0.0:$(GDBPORT)
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=jos $(DOCKIMG) $(MAKE) qemu-nox-gdb GDBSERV=0.0.0.0:$(GDBPORT)
 
 run-%: build
-	docker container run -it --rm jos-env $(MAKE) $@
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKIMG) $(MAKE) $@
 
 run-%-nox: build
-	docker container run -it --rm jos-env $(MAKE) $@
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKIMG) $(MAKE) $@
 
 run-%-gdb: build
-	docker container run -it --rm --net=jos-net --name=jos jos-env $(MAKE) $@ GDBSERV=0.0.0.0:$(GDBPORT)
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=jos $(DOCKIMG) $(MAKE) $@ GDBSERV=0.0.0.0:$(GDBPORT)
 
 run-%-nox-gdb: build
-	docker container run -it --rm --net=jos-net --name=jos jos-env $(MAKE) $@ GDBSERV=0.0.0.0:$(GDBPORT)
+	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=jos $(DOCKIMG) $(MAKE) $@ GDBSERV=0.0.0.0:$(GDBPORT)
 
-.PHONY: build grade net qemu qemu-nox
+.PHONY: net build gdb grade qemu qemu-nox qemu-gdb
