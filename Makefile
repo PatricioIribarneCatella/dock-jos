@@ -8,12 +8,13 @@ DOCKOPTS := -it --rm
 DOCKOPTSGDB := --net=jos-net
 DOCKIMG := jos-env
 DOCKNET := jos-net
+DOCKBASEIMG := 18
 
 net:
 	$(DOCKER) $(DOCKNETWORK) --driver=bridge $(DOCKNET)
 
 build:
-	$(DOCKER) $(DOCKBUILD) -t $(DOCKIMG) .
+	$(DOCKER) $(DOCKBUILD) -t $(DOCKIMG) -f dockerfiles/Dockerfile-$(DOCKBASEIMG).04 .
 
 gdb: build
 	$(DOCKER) $(DOCKRUN) $(DOCKOPTS) $(DOCKOPTSGDB) --name=gdb $(DOCKIMG) $(MAKE) gdb GDBSERV=jos:$(GDBPORT)
