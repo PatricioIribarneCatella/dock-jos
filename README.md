@@ -28,6 +28,8 @@ $ make net
 
 ## Running
 
+You can use different _ubuntu_ versions (16.04, 18.04 and 20.04) just by setting up the variable `DOCKBASEIMG` to the major number of them (i.e. `DOCKBASEIMG=16`). By default the **18** is used.
+
 - ***Grade***
 
 ```bash
