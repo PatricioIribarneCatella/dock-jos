@@ -8,7 +8,7 @@ DOCKOPTS := -it --rm
 DOCKOPTSGDB := --net=jos-net
 DOCKIMG := jos-env
 DOCKNET := jos-net
-DOCKBASEIMG := 18
+DOCKBASEIMG := 16
 
 net:
 	$(DOCKER) $(DOCKNETWORK) --driver=bridge $(DOCKNET)
